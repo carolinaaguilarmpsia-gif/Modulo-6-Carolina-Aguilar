@@ -1,0 +1,23 @@
+{
+  "name": "sgai",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "demo:dj": "npm run demo:dj --prefix demo",
+    "demo:llm": "tsx backend/scripts/demo-llm.ts",
+    "demo:llm:comparar": "tsx backend/scripts/comparar-modelos.ts",
+    "dev:api": "npm run dev --prefix backend",
+    "dev:web": "npm run dev --prefix frontend",
+    "dev:dj": "npm run dev:api & npm run dev:web",
+    "test:domain:dj": "NODE_OPTIONS=--experimental-vm-modules jest backend/domain/declaracion-jurada/services/DJStateMachine.test.ts --watchman=false",
+    "test:domain:auth": "NODE_OPTIONS=--experimental-vm-modules jest backend/domain/administracion --watchman=false",
+    "test:domain": "NODE_OPTIONS=--experimental-vm-modules jest backend/domain --watchman=false --coverage"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.5",
+    "tsx": "^4.19.0",
+    "typescript": "^5.4.0"
+  }
+}

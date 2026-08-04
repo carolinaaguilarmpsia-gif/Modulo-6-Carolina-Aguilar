@@ -1,0 +1,27 @@
+# Dependencias
+node_modules/
+
+# Build / output
+dist/
+build/
+coverage/
+
+# Variables de entorno — NUNCA commitear claves (docs/SKILLS/auth-rbac-guard.md, tarea IA rung 0)
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# macOS
+.DS_Store
+
+# Editores
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# TypeScript
+*.tsbuildinfo

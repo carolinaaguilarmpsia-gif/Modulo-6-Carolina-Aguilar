@@ -1,0 +1,9 @@
+/** @see PR-FSD-UC-002 */
+export enum ComandoDJ {
+  ENVIAR = 'ENVIAR',
+  APROBAR = 'APROBAR',
+  DEVOLVER = 'DEVOLVER',
+  ESCALAR_DPA = 'ESCALAR_DPA',
+  REENVIAR = 'REENVIAR',
+  RECHAZAR = 'RECHAZAR',
+}
