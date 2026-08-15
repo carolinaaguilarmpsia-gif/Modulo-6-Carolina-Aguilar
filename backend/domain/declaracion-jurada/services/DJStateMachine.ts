@@ -179,11 +179,26 @@ export class DJStateMachine {
     };
   }
 
-  /** Visualización / demo — lista transiciones desde un estado */
-  static transicionesDesde(estado: EstadoDJ): ReadonlyArray<{ comando: ComandoDJ; hacia: EstadoDJ }> {
+  /**
+   * Visualización / demo — lista transiciones desde un estado, con los guards de cada una.
+   * @see infrastructure/mcp/DjMcpServer.ts — tool `consultar_reglas_transicion` (el agente
+   * necesita saber roles/observaciones requeridas, no solo el comando y el destino).
+   */
+  static transicionesDesde(estado: EstadoDJ): ReadonlyArray<{
+    comando: ComandoDJ;
+    hacia: EstadoDJ;
+    rolesPermitidos: readonly Rol[];
+    requiereObservaciones: boolean;
+    requiereMismaFacultad: boolean;
+    requiereVinculacionActiva: boolean;
+  }> {
     return REGLAS.filter((r) => r.desde === estado).map((r) => ({
       comando: r.comando,
       hacia: r.hacia,
+      rolesPermitidos: r.rolesPermitidos,
+      requiereObservaciones: r.requiereObservaciones ?? false,
+      requiereMismaFacultad: r.requiereMismaFacultad ?? false,
+      requiereVinculacionActiva: r.requiereVinculacionActiva ?? false,
     }));
   }
 }

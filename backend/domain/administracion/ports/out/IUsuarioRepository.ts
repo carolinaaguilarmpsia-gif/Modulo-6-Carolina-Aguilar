@@ -6,6 +6,8 @@ import type { Usuario } from '../../entities/Usuario.js';
  */
 export interface IUsuarioRepository {
   findByEmail(email: string): Promise<Usuario | null>;
+  /** @see ResponderConsultaDJService — búsqueda de docente por nombre */
+  listar(): Promise<Usuario[]>;
   registrarIntentoFallido(userId: string, params: { intentosFallidos: number; bloqueadoHasta: Date | null }): Promise<void>;
   registrarLoginExitoso(userId: string): Promise<void>;
 }

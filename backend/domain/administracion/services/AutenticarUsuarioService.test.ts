@@ -31,6 +31,9 @@ class FakeUsuarioRepository implements IUsuarioRepository {
   async findByEmail(): Promise<Usuario | null> {
     return this.usuario;
   }
+  async listar(): Promise<Usuario[]> {
+    return this.usuario ? [this.usuario] : [];
+  }
   async registrarIntentoFallido(_userId: string, params: { intentosFallidos: number; bloqueadoHasta: Date | null }): Promise<void> {
     this.llamadasFallo.push(params);
     if (this.usuario) {

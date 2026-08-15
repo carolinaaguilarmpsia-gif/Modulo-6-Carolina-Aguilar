@@ -16,6 +16,12 @@ export const USER_MESSAGES_ES_BO = {
   INSUFFICIENT_ROLE: 'No tiene permisos para acceder a este recurso.',
   TOKEN_EXPIRED: 'La sesión expiró. Inicie sesión nuevamente.',
   TOKEN_INVALID: 'Token de autenticación inválido.',
+  // @see ResponderConsultaDJService — búsqueda de docente/DJ real a partir de la consulta del admin
+  DOCENTE_NOT_FOUND: 'No se encontró ningún docente con ese nombre.',
+  DOCENTE_AMBIGUO: 'Hay más de un docente que coincide con ese nombre. Sea más específico.',
+  // @see AgenteDJService — confirmación de acciones de escritura propuestas por el agente
+  AGENTE_SESION_NOT_FOUND: 'La confirmación solicitada expiró o no existe. Vuelva a preguntarle al asistente.',
+  AGENTE_SESION_AJENA: 'Esta confirmación pertenece a otra sesión.',
 } as const;
 
 export type DomainErrorCode = keyof typeof USER_MESSAGES_ES_BO;
