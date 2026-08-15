@@ -1,6 +1,7 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import { RequireAuth } from './components/RequireAuth';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { AsistenteDJPage } from './pages/declaraciones-juradas/AsistenteDJPage';
 import { DetalleDeclaracionJuradaPage } from './pages/declaraciones-juradas/DetalleDeclaracionJuradaPage';
 import { DjLayout } from './pages/declaraciones-juradas/DjLayout';
 import { ListaDeclaracionesJuradasPage } from './pages/declaraciones-juradas/ListaDeclaracionesJuradasPage';
@@ -29,6 +30,7 @@ export default function App() {
           >
             <Route index element={<ListaDeclaracionesJuradasPage />} />
             <Route path="nueva" element={<NuevaDeclaracionJuradaPage />} />
+            <Route path="asistente" element={<AsistenteDJPage />} />
             <Route path=":id" element={<DetalleDeclaracionJuradaPage />} />
           </Route>
         </Routes>
