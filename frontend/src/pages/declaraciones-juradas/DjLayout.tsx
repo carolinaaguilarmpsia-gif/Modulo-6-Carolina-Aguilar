@@ -35,6 +35,11 @@ export function DjLayout() {
                 Nueva DJ
               </Link>
             ) : null}
+            {auth.rol === 'ADMIN_FACULTAD' || auth.rol === 'TECNICO_DPA' ? (
+              <Link to="/declaraciones-juradas/asistente" className="rounded-md px-3 py-1.5 text-slate-700 hover:bg-slate-100">
+                Asistente MCP
+              </Link>
+            ) : null}
             <button
               type="button"
               onClick={handleLogout}
@@ -50,14 +55,9 @@ export function DjLayout() {
               Sesión: <strong>{auth.nombreCompleto}</strong> ({auth.label})
             </span>
             {auth.rol === 'DOCENTE' ? (
-              <label className="flex items-center gap-2 text-amber-900">
-                <input
-                  type="checkbox"
-                  checked={auth.inactiveBinding}
-                  onChange={(e) => auth.setInactiveBinding(e.target.checked)}
-                />
-                Simular sin vinculación activa (demo RB-01)
-              </label>
+              <span className="text-xs text-slate-500">
+                Para probar RB-01 (sin vinculación activa), iniciá sesión como Carlos Paz.
+              </span>
             ) : null}
           </div>
         </div>
