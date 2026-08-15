@@ -102,3 +102,28 @@ export interface ListDjResponse {
   items: DjSummary[];
   total: number;
 }
+
+// --- Agente MCP sobre Declaraciones Juradas ---
+
+export interface PasoTraza {
+  paso: number;
+  pensamiento?: string;
+  herramienta?: string;
+  argumentos?: Record<string, unknown>;
+  observacion?: string;
+  tokensUsados?: number;
+}
+
+export interface ConfirmacionPendiente {
+  herramienta: string;
+  argumentos: Record<string, unknown>;
+  resumen: string;
+}
+
+export interface AgenteDJResponse {
+  respuesta?: string;
+  traza: PasoTraza[];
+  confirmacionPendiente?: ConfirmacionPendiente;
+  sessionId?: string;
+  correlationId?: string;
+}
