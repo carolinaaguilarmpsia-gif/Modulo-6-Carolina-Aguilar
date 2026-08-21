@@ -1,7 +1,7 @@
 import type { FuenteTramite } from './Tramite.js';
 
 /** Cómo se resolvió la pregunta — visible en el chat como etiqueta de transparencia. */
-export type CaminoRespuesta = 'keyword' | 'llm';
+export type CaminoRespuesta = 'keyword' | 'rag' | 'llm';
 
 export type NombreHerramienta =
   | 'CONSULTAR_REQUISITOS'
@@ -22,6 +22,8 @@ export interface AsistenteTramitesResult {
   herramienta: NombreHerramienta | null;
   /** Trámite + departamento de db.json que originó la respuesta; null si es fuera de alcance. */
   fuente: FuenteTramite | null;
+  /** Solo cuando camino === 'rag' — similitud coseno (0-1) entre la pregunta y el trámite recuperado. */
+  similitud?: number;
   /** Solo presente en el escenario "fuera de alcance" — el "no sé, pero esto sí". */
   tramitesDisponibles?: DepartamentoListado[];
   iaHabilitada: boolean;

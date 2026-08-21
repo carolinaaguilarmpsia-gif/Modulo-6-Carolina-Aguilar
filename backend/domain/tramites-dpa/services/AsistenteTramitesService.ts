@@ -5,9 +5,23 @@ import type { AsistenteTramitesResult, CaminoRespuesta, NombreHerramienta } from
 import { construirCatalogo, encontrarPorKeyword } from './TramiteKeywordCatalog.js';
 import { TramiteToolsService } from './TramiteToolsService.js';
 import { DecidirHerramientaLlmService } from './DecidirHerramientaLlmService.js';
+import type { RetrieverSemanticoTramitesService } from './RetrieverSemanticoTramitesService.js';
 
 const RE_TIEMPO = /\b(tiempo|plazo|cu[aá]ndo|con cu[aá]nt[ao]|anticipaci[oó]n|d[ií]as antes)\b/i;
 const RE_NORMATIVA = /\b(normativa|resoluci[oó]n|reglamento|marco legal|respalda)\b/i;
+
+/**
+ * Guard del paso RAG — medido empíricamente: "¿Cuánto gana un docente a dedicación exclusiva?"
+ * (una pregunta de MONTO, no de procedimiento) recupera por similitud coseno el trámite
+ * "Nombramiento Docentes a Dedicación Exclusiva" con score 0.76 — más alto que el match
+ * correcto de una pregunta real ("constancia laboral" → 0.62). La similitud pura por embeddings
+ * confunde TEMA (comparten "dedicación exclusiva") con INTENCIÓN (una es un trámite, la otra no),
+ * y ni subir el umbral ni exigir margen sobre el segundo puesto lo resuelve — el falso positivo
+ * queda más arriba en ambos casos. DecidirHerramientaLlmService ya resuelve esto para el LLM-router
+ * (se lo pide explícito en el prompt); acá se aplica el mismo criterio antes de confiar en RAG.
+ */
+const RE_FUERA_DE_ALCANCE_TEMATICO =
+  /\b(cu[aá]nto gana|sueldo|salario|remuneraci[oó]n|honorarios|ingreso mensual|opini[oó]n|opinas|te parece|mejor que)\b/i;
 
 function detectarHerramienta(pregunta: string): NombreHerramienta {
   if (RE_TIEMPO.test(pregunta)) return 'CONSULTAR_TIEMPO';
@@ -22,9 +36,11 @@ interface HerramientaEjecutada {
 }
 
 /**
- * Router de 3 pasos: keyword directo → LLM elige herramienta → fallback "no sé" + LISTAR_TRAMITES.
- * db.json es la única fuente de datos; este servicio nunca deja que el LLM redacte texto libre,
- * solo elige QUÉ herramienta y QUÉ trámite consultar (ver DecidirHerramientaLlmService).
+ * Router de 4 pasos: keyword directo → RAG semántico (embeddings) → LLM elige herramienta →
+ * fallback "no sé" + LISTAR_TRAMITES. db.json es la única fuente de datos; este servicio nunca
+ * deja que el LLM redacte texto libre, solo elige (por similitud o por tool-call) QUÉ trámite
+ * consultar — la respuesta siempre se arma en código desde datos reales (ver
+ * RetrieverSemanticoTramitesService y DecidirHerramientaLlmService).
  */
 export class AsistenteTramitesService {
   private readonly catalogo: TramiteKeywordEntry[];
@@ -34,7 +50,8 @@ export class AsistenteTramitesService {
   constructor(
     private readonly tramites: ITramiteRepository,
     llm: ILlmClient | null,
-    private readonly iaHabilitada: boolean
+    private readonly iaHabilitada: boolean,
+    private readonly retrieverSemantico: RetrieverSemanticoTramitesService | null = null
   ) {
     this.catalogo = construirCatalogo(tramites.listarTodos());
     this.tools = new TramiteToolsService(tramites);
@@ -46,6 +63,15 @@ export class AsistenteTramitesService {
     if (keywordMatch) {
       const ejecutado = this.ejecutar(detectarHerramienta(pregunta), keywordMatch.codigo);
       if (ejecutado) return this.respuestaConTramite(ejecutado, 'keyword');
+    }
+
+    if (this.iaHabilitada && this.retrieverSemantico && !RE_FUERA_DE_ALCANCE_TEMATICO.test(pregunta)) {
+      // Nunca deja caer el chat entero por un Ollama caído — degrada al siguiente paso del router.
+      const match = await this.retrieverSemantico.buscar(pregunta).catch(() => null);
+      if (match) {
+        const ejecutado = this.ejecutar(detectarHerramienta(pregunta), match.codigo);
+        if (ejecutado) return this.respuestaConTramite(ejecutado, 'rag', match.similitud);
+      }
     }
 
     if (this.iaHabilitada && this.decisor) {
@@ -93,12 +119,13 @@ export class AsistenteTramitesService {
     }
   }
 
-  private respuestaConTramite(ejecutado: HerramientaEjecutada, camino: CaminoRespuesta): AsistenteTramitesResult {
+  private respuestaConTramite(ejecutado: HerramientaEjecutada, camino: CaminoRespuesta, similitud?: number): AsistenteTramitesResult {
     return {
       respuesta: ejecutado.texto,
       camino,
       herramienta: ejecutado.herramienta,
       fuente: ejecutado.fuente,
+      ...(similitud !== undefined ? { similitud } : {}),
       iaHabilitada: this.iaHabilitada,
       fuenteDatos: 'db.json',
     };

@@ -1,8 +1,10 @@
 import { jest } from '@jest/globals';
 import type { ITramiteRepository } from '../ports/out/ITramiteRepository.js';
 import type { ILlmClient } from '../ports/out/ILlmClient.js';
+import type { IEmbeddingsClient } from '../ports/out/IEmbeddingsClient.js';
 import type { DepartamentoTramites, TramiteConDepartamento } from '../types/Tramite.js';
 import { AsistenteTramitesService } from './AsistenteTramitesService.js';
+import { RetrieverSemanticoTramitesService } from './RetrieverSemanticoTramitesService.js';
 
 const DEPARTAMENTOS: DepartamentoTramites[] = [
   {
@@ -120,6 +122,69 @@ describe('AsistenteTramitesService', () => {
     const service = new AsistenteTramitesService(new FakeTramiteRepository(), null, false);
 
     const resultado = await service.preguntar('¿Qué necesito para que me den una constancia laboral?');
+
+    expect(resultado.camino).toBeNull();
+    expect(resultado.tramitesDisponibles).toBeDefined();
+  });
+
+  it('escenario RAG — un sinónimo sin overlap textual se resuelve por embeddings, sin llegar a llamar al LLM-router', async () => {
+    class FakeEmbeddingsClient implements IEmbeddingsClient {
+      async embed(texto: string): Promise<number[]> {
+        if (texto.includes('Certificado de Trabajo')) return [1, 0, 0];
+        if (texto.includes('constancia laboral')) return [0.9, 0.1, 0];
+        return [0, 0, 1];
+      }
+    }
+    const llm = new FakeLlmClient('no debería llamarse — el RAG ya lo resolvió antes');
+    const repo = new FakeTramiteRepository();
+    const retriever = new RetrieverSemanticoTramitesService(new FakeEmbeddingsClient(), repo.listarTodos());
+    const service = new AsistenteTramitesService(repo, llm, true, retriever);
+
+    const resultado = await service.preguntar('¿Qué necesito para que me den una constancia laboral?');
+
+    expect(resultado.camino).toBe('rag');
+    expect(resultado.fuente?.codigo).toBe('DPA-01');
+    expect(resultado.similitud).toBeGreaterThan(0.9);
+    expect(llm.llamadas).toBe(0);
+  });
+
+  it('RAG por debajo del umbral cede el turno al LLM-router (nunca inventa un trámite)', async () => {
+    class FakeEmbeddingsClient implements IEmbeddingsClient {
+      async embed(texto: string): Promise<number[]> {
+        // Cada trámite (chunk del índice) se embebe en su propio eje; la pregunta va en un
+        // tercer eje ortogonal a ambos — ningún trámite se le parece, a propósito.
+        if (texto.includes('Certificado de Trabajo')) return [1, 0, 0];
+        if (texto.includes('Oferta Académica')) return [0, 1, 0];
+        return [0, 0, 1];
+      }
+    }
+    const llm = new FakeLlmClient('{"tool": "CONSULTAR_REQUISITOS", "codigo": "DPA-01"}');
+    const repo = new FakeTramiteRepository();
+    const retriever = new RetrieverSemanticoTramitesService(new FakeEmbeddingsClient(), repo.listarTodos());
+    const service = new AsistenteTramitesService(repo, llm, true, retriever);
+
+    const resultado = await service.preguntar('¿Qué necesito para que me den una constancia laboral?');
+
+    expect(resultado.camino).toBe('llm');
+    expect(llm.llamadas).toBe(1);
+  });
+
+  it('una pregunta de MONTO (no de procedimiento) nunca pasa por RAG, aunque el embedding matchee alto por overlap de palabras', async () => {
+    // Regresión de un caso real medido: "¿Cuánto gana...a dedicación exclusiva?" recupera por
+    // similitud coseno el trámite "...Dedicación Exclusiva" con score alto porque comparten
+    // texto, aunque la pregunta no sea sobre el trámite. Este Fake simula justamente eso —
+    // si el guard temático fallara, este test lo detectaría.
+    class FakeEmbeddingsClientQueMatcheaMal implements IEmbeddingsClient {
+      async embed(): Promise<number[]> {
+        return [1, 0, 0]; // "matchea" con todo — si el guard no corta antes, este test falla
+      }
+    }
+    const llm = new FakeLlmClient('{"tool": "NONE"}');
+    const repo = new FakeTramiteRepository();
+    const retriever = new RetrieverSemanticoTramitesService(new FakeEmbeddingsClientQueMatcheaMal(), repo.listarTodos());
+    const service = new AsistenteTramitesService(repo, llm, true, retriever);
+
+    const resultado = await service.preguntar('¿Cuánto gana un docente a dedicación exclusiva?');
 
     expect(resultado.camino).toBeNull();
     expect(resultado.tramitesDisponibles).toBeDefined();

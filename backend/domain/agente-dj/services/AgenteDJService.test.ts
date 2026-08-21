@@ -128,7 +128,8 @@ describe('AgenteDJService', () => {
 
     expect(resultado.confirmacionPendiente?.herramienta).toBe(HERRAMIENTA_ESCRITURA_DJ);
     expect(resultado.sessionId).toBeDefined();
-    expect(toolClient.llamadas).toHaveLength(0);
+    // La única llamada permitida antes de confirmar es la lectura del preview — nunca la escritura.
+    expect(toolClient.llamadas.map((l) => l.nombre)).not.toContain(HERRAMIENTA_ESCRITURA_DJ);
   });
 
   it('confirmar(true) ejecuta la escritura y redacta la respuesta desde el resultado real, no el LLM', async () => {
@@ -153,7 +154,73 @@ describe('AgenteDJService', () => {
 
     expect(resultado.respuesta).toContain('dj-1');
     expect(resultado.respuesta).toContain('APROBADA');
-    expect(toolClient.llamadas).toEqual([{ nombre: HERRAMIENTA_ESCRITURA_DJ, argumentos: { djId: 'dj-1', comando: 'APROBAR' } }]);
+    // La primera llamada es la lectura del preview (durante preguntar); la escritura recién se ejecuta al confirmar.
+    expect(toolClient.llamadas).toEqual([
+      { nombre: 'consultar_declaracion_jurada', argumentos: { djId: 'dj-1' } },
+      { nombre: HERRAMIENTA_ESCRITURA_DJ, argumentos: { djId: 'dj-1', comando: 'APROBAR' } },
+    ]);
+  });
+
+  it('la pausa por confirmación incluye un preview de la DJ real — no solo el id', async () => {
+    const llm = new FakeAgentLlmClient([
+      {
+        contenido: null,
+        llamadasHerramientas: [{ id: 't1', nombre: HERRAMIENTA_ESCRITURA_DJ, argumentos: { djId: 'dj-1', comando: 'APROBAR' } }],
+        tokensUsados: 10,
+      },
+    ]);
+    const toolClient = new FakeAgentToolClient([], {
+      consultar_declaracion_jurada: {
+        contenido: JSON.stringify({
+          id: 'dj-1',
+          docenteId: 'docente-juan-jaldin',
+          facultadId: 'facultad-demo-001',
+          estado: 'EN_REVISION_FACULTAD',
+          tipo: 'LABORAL',
+          periodoAcademico: '2026-I',
+          camposFormulario: { cargoInstitucional: 'Docente Titular' },
+        }),
+        esError: false,
+      },
+    });
+    const factory = new FakeAgentToolClientFactory(toolClient);
+    const service = new AgenteDJService(llm, factory, new FakeAgentSessionStore());
+
+    const resultado = await service.preguntar(ACTOR_ADMIN_FACULTAD, 'Aprobá la DJ de Juan Jaldín');
+
+    expect(resultado.confirmacionPendiente?.preview).toEqual({
+      djId: 'dj-1',
+      docenteId: 'docente-juan-jaldin',
+      facultadId: 'facultad-demo-001',
+      tipo: 'LABORAL',
+      periodoAcademico: '2026-I',
+      estadoActual: 'EN_REVISION_FACULTAD',
+      estadoPropuesto: 'APROBADA',
+      comando: 'APROBAR',
+      camposFormulario: { cargoInstitucional: 'Docente Titular' },
+    });
+    expect(resultado.confirmacionPendiente?.resumen).toContain('EN_REVISION_FACULTAD a APROBADA');
+    expect(toolClient.llamadas).toContainEqual({ nombre: 'consultar_declaracion_jurada', argumentos: { djId: 'dj-1' } });
+  });
+
+  it('si la consulta de preview falla, igual pausa para confirmar (sin preview, no se bloquea)', async () => {
+    const llm = new FakeAgentLlmClient([
+      {
+        contenido: null,
+        llamadasHerramientas: [{ id: 't1', nombre: HERRAMIENTA_ESCRITURA_DJ, argumentos: { djId: 'dj-inexistente', comando: 'APROBAR' } }],
+        tokensUsados: 10,
+      },
+    ]);
+    const toolClient = new FakeAgentToolClient([], {
+      consultar_declaracion_jurada: { contenido: JSON.stringify({ error: 'DJ_NOT_FOUND' }), esError: true },
+    });
+    const factory = new FakeAgentToolClientFactory(toolClient);
+    const service = new AgenteDJService(llm, factory, new FakeAgentSessionStore());
+
+    const resultado = await service.preguntar(ACTOR_ADMIN_FACULTAD, 'Aprobá la DJ dj-inexistente');
+
+    expect(resultado.confirmacionPendiente?.preview).toBeUndefined();
+    expect(resultado.sessionId).toBeDefined();
   });
 
   it('confirmar(false) cancela sin ejecutar nada', async () => {
@@ -172,7 +239,8 @@ describe('AgenteDJService', () => {
     const resultado = await service.confirmar(ACTOR_ADMIN_FACULTAD, propuesta.sessionId!, false);
 
     expect(resultado.respuesta).toContain('cancelada');
-    expect(toolClient.llamadas).toHaveLength(0);
+    // La única llamada fue la lectura del preview — cancelar nunca llega a invocar la escritura.
+    expect(toolClient.llamadas.map((l) => l.nombre)).not.toContain(HERRAMIENTA_ESCRITURA_DJ);
   });
 
   it('confirmar desde un usuario distinto al que originó la propuesta se rechaza', async () => {
@@ -190,7 +258,8 @@ describe('AgenteDJService', () => {
     const propuesta = await service.preguntar(ACTOR_ADMIN_FACULTAD, 'Aprobá la DJ dj-1');
 
     await expect(service.confirmar(ACTOR_OTRO_USUARIO, propuesta.sessionId!, true)).rejects.toThrow(ForbiddenError);
-    expect(toolClient.llamadas).toHaveLength(0);
+    // La única llamada fue la lectura del preview — el rechazo por sesión ajena nunca llega a la escritura.
+    expect(toolClient.llamadas.map((l) => l.nombre)).not.toContain(HERRAMIENTA_ESCRITURA_DJ);
   });
 
   it('confirmar con un sessionId que no existe (o ya se usó) tira NotFoundError', async () => {

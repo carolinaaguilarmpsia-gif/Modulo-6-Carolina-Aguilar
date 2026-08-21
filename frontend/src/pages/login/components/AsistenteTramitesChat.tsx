@@ -31,6 +31,18 @@ function SparklesIcon() {
   );
 }
 
+function SearchIcon() {
+  return (
+    <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true">
+      <path
+        fillRule="evenodd"
+        d="M9 3.5a5.5 5.5 0 1 0 3.61 9.65l3.12 3.12a.75.75 0 1 0 1.06-1.06l-3.12-3.12A5.5 5.5 0 0 0 9 3.5ZM5 9a4 4 0 1 1 8 0 4 4 0 0 1-8 0Z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
 function WarningIcon() {
   return (
     <svg viewBox="0 0 20 20" fill="currentColor" className="h-3.5 w-3.5" aria-hidden="true">
@@ -43,12 +55,19 @@ function WarningIcon() {
   );
 }
 
-/** Etiqueta verde/bolt (keyword, determinístico) o morada/sparkles (pasó por el LLM). */
-function CaminoBadge({ camino }: { camino: 'keyword' | 'llm' }) {
+/** Etiqueta verde/bolt (keyword, determinístico), azul/lupa (RAG por embeddings) o morada/sparkles (LLM eligió la herramienta). */
+function CaminoBadge({ camino, similitud }: { camino: 'keyword' | 'rag' | 'llm'; similitud?: number }) {
   if (camino === 'keyword') {
     return (
       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-800">
         <BoltIcon /> Keyword
+      </span>
+    );
+  }
+  if (camino === 'rag') {
+    return (
+      <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold text-blue-800">
+        <SearchIcon /> RAG{similitud !== undefined ? ` · similitud ${similitud.toFixed(2)}` : ''}
       </span>
     );
   }
@@ -170,7 +189,11 @@ export function AsistenteTramitesChat() {
 
               {m.role === 'assistant' && m.datos ? (
                 <div className="mt-2 flex flex-wrap items-center gap-1.5">
-                  {m.datos.camino ? <CaminoBadge camino={m.datos.camino} /> : <FueraDeAlcanceBadge />}
+                  {m.datos.camino ? (
+                    <CaminoBadge camino={m.datos.camino} similitud={m.datos.similitud} />
+                  ) : (
+                    <FueraDeAlcanceBadge />
+                  )}
                   {m.datos.herramienta ? <HerramientaBadge herramienta={m.datos.herramienta} /> : null}
                   {m.datos.fuente ? (
                     <FuenteBadge codigo={m.datos.fuente.codigo} departamento={m.datos.fuente.departamento} />

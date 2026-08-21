@@ -16,11 +16,8 @@ export interface AuthState {
   label: string;
   nombreCompleto: string;
   facultadId: string | null;
-  /** Simulación RB-01 (solo demo) — DJ sin vinculación activa. Independiente de la identidad real. */
-  inactiveBinding: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
-  setInactiveBinding: (value: boolean) => void;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -38,13 +35,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     label: session ? ROLE_LABELS[session.rol] : '',
     nombreCompleto: session?.nombreCompleto ?? '',
     facultadId: session?.facultadId ?? null,
-    inactiveBinding: authStore.getInactiveBinding(),
     login: async (email: string, password: string) => {
       const result = await loginRequest(email, password);
       authStore.setSession(result);
     },
     logout: () => authStore.setSession(null),
-    setInactiveBinding: (value: boolean) => authStore.setInactiveBindingFlag(value),
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,12 +1,14 @@
 import { randomUUID } from 'node:crypto';
 import { ForbiddenError, NotFoundError } from '../../shared/errors/DomainError.js';
+import { DJStateMachine } from '../../declaracion-jurada/services/DJStateMachine.js';
 import type { ActorContext } from '../../declaracion-jurada/types/CrearDJ.js';
+import type { EstadoDJ } from '../../declaracion-jurada/types/EstadoDJ.js';
 import type { IAgentLlmClient } from '../ports/out/IAgentLlmClient.js';
 import type { IAgentSessionStore } from '../ports/out/IAgentSessionStore.js';
 import type { IAgentToolClient } from '../ports/out/IAgentToolClient.js';
 import type { IAgentToolClientFactory } from '../ports/out/IAgentToolClientFactory.js';
 import { HERRAMIENTA_ESCRITURA_DJ } from '../types/Agente.js';
-import type { AgenteDJResult, AgentMessage, AgentToolDef, PasoTraza } from '../types/Agente.js';
+import type { AgenteDJResult, AgentMessage, AgentToolDef, DJPreview, PasoTraza } from '../types/Agente.js';
 
 /** Guardrail "freno" — nunca más de 6 vueltas del bucle Pensamiento→Acción→Observación. */
 const MAX_PASOS = 6;
@@ -20,6 +22,8 @@ const SYSTEM_PROMPT = [
   'Error común a evitar: en el paso 2 NUNCA pongas estado="APROBADA" (ni ningún otro) pensando en el resultado que',
   'buscás — todavía no sabés el estado actual, por eso listás sin filtro de estado.',
   'transicionar_declaracion_jurada siempre pausa para confirmación humana — vos solo la proponés.',
+  'Si buscar_docente_por_nombre no encuentra al docente pero la respuesta trae context.sugerencias, NUNCA digas',
+  'simplemente "no existe" — proponé esos nombres reales ("¿Quisiste decir Juan Jaldín?") para que la persona confirme.',
 ].join('\n');
 
 /**
@@ -127,6 +131,7 @@ export class AgenteDJService {
 
       if (llamada.nombre === HERRAMIENTA_ESCRITURA_DJ) {
         const sessionId = randomUUID();
+        const preview = await this.construirPreview(toolClient, llamada.argumentos);
         this.sessionStore.guardar(sessionId, {
           sessionId,
           actorUserId: actor.userId,
@@ -142,7 +147,8 @@ export class AgenteDJService {
           confirmacionPendiente: {
             herramienta: llamada.nombre,
             argumentos: llamada.argumentos,
-            resumen: this.resumirPropuesta(llamada.argumentos),
+            resumen: this.resumirPropuesta(llamada.argumentos, preview),
+            preview,
           },
         };
       }
@@ -168,10 +174,60 @@ export class AgenteDJService {
     };
   }
 
-  private resumirPropuesta(argumentos: Record<string, unknown>): string {
+  /**
+   * Guardrail "preview" — antes de pausar por confirmación se consulta la DJ real (misma
+   * herramienta de lectura que usaría el modelo) para que la tarjeta de confirmación muestre
+   * de qué DJ se trata, no solo su id. Si la consulta falla (id inválido, etc.) se pausa igual
+   * pero sin preview — nunca se bloquea la confirmación por esto.
+   */
+  private async construirPreview(toolClient: IAgentToolClient, argumentos: Record<string, unknown>): Promise<DJPreview | undefined> {
+    const djId = typeof argumentos.djId === 'string' ? argumentos.djId : undefined;
+    if (!djId) return undefined;
+
+    const { contenido, esError } = await toolClient.llamarHerramienta('consultar_declaracion_jurada', { djId });
+    if (esError) return undefined;
+
+    try {
+      const dj = JSON.parse(contenido) as {
+        id: string;
+        docenteId: string;
+        facultadId: string;
+        estado: EstadoDJ;
+        tipo: string;
+        periodoAcademico: string;
+        camposFormulario: Record<string, unknown>;
+      };
+      const comando = String(argumentos.comando ?? '');
+      const transicion = DJStateMachine.transicionesDesde(dj.estado).find((t) => t.comando === comando);
+
+      return {
+        djId: dj.id,
+        docenteId: dj.docenteId,
+        facultadId: dj.facultadId,
+        tipo: dj.tipo,
+        periodoAcademico: dj.periodoAcademico,
+        estadoActual: dj.estado,
+        estadoPropuesto: transicion?.hacia,
+        comando,
+        camposFormulario: dj.camposFormulario,
+      };
+    } catch {
+      return undefined;
+    }
+  }
+
+  private resumirPropuesta(argumentos: Record<string, unknown>, preview?: DJPreview): string {
     const djId = String(argumentos.djId ?? '?');
     const comando = String(argumentos.comando ?? '?');
-    return `El agente propone ejecutar ${comando} sobre la Declaración Jurada ${djId}. ¿Confirmás?`;
+    if (!preview) {
+      return `El agente propone ejecutar ${comando} sobre la Declaración Jurada ${djId}. ¿Confirmás?`;
+    }
+
+    const destino = preview.estadoPropuesto ? ` (pasaría de ${preview.estadoActual} a ${preview.estadoPropuesto})` : '';
+    return (
+      `El agente propone ejecutar ${comando} sobre la DJ ${djId} — docente ${preview.docenteId}, ` +
+      `tipo ${preview.tipo}, período ${preview.periodoAcademico}${destino}. Revisá el detalle antes de confirmar.`
+    );
   }
 
   private resumirEjecucion(contenidoJson: string): string {

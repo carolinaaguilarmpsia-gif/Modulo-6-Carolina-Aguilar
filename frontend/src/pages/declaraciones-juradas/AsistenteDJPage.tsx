@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { confirmarAgenteDJ, preguntarAgenteDJ } from '../../services/agenteDjApi';
-import type { AgenteDJResponse, PasoTraza } from '../../types/api';
+import type { AgenteDJResponse, DJPreview, PasoTraza } from '../../types/api';
 import { ApiError } from '../../types/api';
+import { DJStateBadge } from './components/DJStateBadge';
 
 interface ChatMessage {
   id: string;
@@ -45,6 +46,62 @@ function TrazaPanel({ traza }: { traza: PasoTraza[] }) {
   );
 }
 
+/** Campos típicos del formulario de DJ (@see createDjSchema.ts) — se muestran si están presentes, sin asumir que siempre lo estén. */
+function DJPreviewCard({ preview }: { preview: DJPreview }) {
+  const campos = preview.camposFormulario as {
+    dependencia?: string;
+    cargoInstitucional?: string;
+    actividadesDescripcion?: string;
+  };
+
+  return (
+    <div className="mt-3 rounded-md border border-amber-200 bg-white p-3">
+      <p className="text-xs font-semibold uppercase tracking-wide text-amber-700">Vista previa de la declaración jurada</p>
+      <dl className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs text-slate-700">
+        <dt className="text-slate-500">Docente</dt>
+        <dd className="font-medium text-slate-900">{preview.docenteId}</dd>
+
+        <dt className="text-slate-500">Tipo</dt>
+        <dd>{preview.tipo}</dd>
+
+        <dt className="text-slate-500">Período académico</dt>
+        <dd>{preview.periodoAcademico}</dd>
+
+        {campos.dependencia ? (
+          <>
+            <dt className="text-slate-500">Facultad</dt>
+            <dd>{campos.dependencia}</dd>
+          </>
+        ) : null}
+
+        {campos.cargoInstitucional ? (
+          <>
+            <dt className="text-slate-500">Cargo institucional</dt>
+            <dd>{campos.cargoInstitucional}</dd>
+          </>
+        ) : null}
+
+        <dt className="text-slate-500">Estado</dt>
+        <dd className="flex items-center gap-1.5">
+          <DJStateBadge estado={preview.estadoActual} />
+          {preview.estadoPropuesto ? (
+            <>
+              <span aria-hidden="true">→</span>
+              <DJStateBadge estado={preview.estadoPropuesto} />
+            </>
+          ) : null}
+        </dd>
+      </dl>
+      {campos.actividadesDescripcion ? (
+        <p className="mt-2 border-t border-slate-100 pt-2 text-xs text-slate-600">
+          <span className="text-slate-500">Actividades declaradas: </span>
+          {campos.actividadesDescripcion}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
 function ConfirmacionCard({
   datos,
   onConfirmar,
@@ -60,6 +117,7 @@ function ConfirmacionCard({
     <div className="mt-2 rounded-lg border border-amber-300 bg-amber-50 p-3">
       <p className="text-sm font-semibold text-amber-900">Confirmación requerida</p>
       <p className="mt-1 text-sm text-amber-900">{datos.confirmacionPendiente.resumen}</p>
+      {datos.confirmacionPendiente.preview ? <DJPreviewCard preview={datos.confirmacionPendiente.preview} /> : null}
       <div className="mt-3 flex gap-2">
         <button
           type="button"

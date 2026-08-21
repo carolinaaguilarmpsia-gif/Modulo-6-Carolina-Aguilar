@@ -57,7 +57,11 @@ export function createDjMcpServer(actor: ActorContext, deps: DjMcpServerDeps): M
   server.registerTool(
     'buscar_docente_por_nombre',
     {
-      description: 'Busca un docente por nombre (parcial, sin distinguir mayúsculas/tildes). Devuelve su id real.',
+      description:
+        'Busca un docente por nombre (parcial, sin distinguir mayúsculas/tildes). Devuelve su id real. ' +
+        'Si no hay coincidencia, la respuesta es DOCENTE_NOT_FOUND con context.sugerencias — una lista de ' +
+        'nombres reales parecidos (posible error de tipeo). Nunca respondas "no existe" sin revisar antes ' +
+        'si vino esa lista: si vino, proponé esos nombres al usuario ("¿Quisiste decir...?") en vez de cortar la conversación.',
       inputSchema: {
         nombre: z.string().min(2).describe('Nombre o parte del nombre del docente'),
       },

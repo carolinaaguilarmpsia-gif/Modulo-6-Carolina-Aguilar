@@ -114,10 +114,24 @@ export interface PasoTraza {
   tokensUsados?: number;
 }
 
+/** Vista previa de la DJ real antes de confirmar una escritura del agente — para que quien confirma vea qué está aceptando, no solo un id. */
+export interface DJPreview {
+  djId: string;
+  docenteId: string;
+  facultadId: string;
+  tipo: string;
+  periodoAcademico: string;
+  estadoActual: EstadoDJ;
+  estadoPropuesto?: EstadoDJ;
+  comando: ComandoDJ;
+  camposFormulario: Record<string, unknown>;
+}
+
 export interface ConfirmacionPendiente {
   herramienta: string;
   argumentos: Record<string, unknown>;
   resumen: string;
+  preview?: DJPreview;
 }
 
 export interface AgenteDJResponse {

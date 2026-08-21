@@ -12,6 +12,7 @@ import type { AgentLlmTurn, AgentMessage, AgentToolDef } from '../domain/agente-
 import { ConsoleNotificacionPublisher } from '../infrastructure/notifications/ConsoleNotificacionPublisher.js';
 import { InMemoryDeclaracionJuradaRepository } from '../infrastructure/persistence/InMemoryDeclaracionJuradaRepository.js';
 import { InMemoryUsuarioRepository } from '../infrastructure/persistence/InMemoryUsuarioRepository.js';
+import { declaracionesJuradasSemilla } from '../infrastructure/persistence/seedDeclaracionesJuradas.js';
 import { InMemoryAgenteSessionStore } from '../infrastructure/persistence/InMemoryAgenteSessionStore.js';
 import { JsonTramiteRepository } from '../infrastructure/persistence/JsonTramiteRepository.js';
 import { BcryptPasswordHasher } from '../infrastructure/auth/BcryptPasswordHasher.js';
@@ -19,17 +20,25 @@ import { JwtSigner } from '../infrastructure/auth/JwtSigner.js';
 import { LdapUnavailableAuthenticator } from '../infrastructure/auth/LdapUnavailableAuthenticator.js';
 import { GroqClient } from '../infrastructure/ai/GroqClient.js';
 import { GroqAgentClient } from '../infrastructure/ai/GroqAgentClient.js';
+import { OllamaEmbeddingsClient } from '../infrastructure/ai/OllamaEmbeddingsClient.js';
+import { RetrieverSemanticoTramitesService } from '../domain/tramites-dpa/services/RetrieverSemanticoTramitesService.js';
 import { InProcessMcpToolClientFactory } from '../infrastructure/mcp/InProcessMcpToolClient.js';
+import { OrquestadorAtencionService } from '../domain/orquestador-atencion/services/OrquestadorAtencionService.js';
+import { ClasificarIntencionService } from '../domain/orquestador-atencion/services/ClasificarIntencionService.js';
+import { JsonConversacionRepository } from '../infrastructure/persistence/JsonConversacionRepository.js';
+import { ConsoleEscalamientoPublisher } from '../infrastructure/notifications/ConsoleEscalamientoPublisher.js';
 import { loadEnvFile } from '../infrastructure/config/loadEnv.js';
 import { AsistenteController } from './controllers/asistente.controller.js';
 import { AsistenteTramitesController } from './controllers/asistenteTramites.controller.js';
 import { AgenteDjController } from './controllers/agenteDj.controller.js';
+import { OrquestadorController } from './controllers/orquestador.controller.js';
 import { AuthController } from './controllers/auth.controller.js';
 import { DjController } from './controllers/dj.controller.js';
 import { globalErrorHandler } from './middleware/auth.middleware.js';
 import { createAsistenteRouter } from './routes/asistente.routes.js';
 import { createAsistenteTramitesRouter } from './routes/asistenteTramites.routes.js';
 import { createAgenteDjRouter } from './routes/agenteDj.routes.js';
+import { createOrquestadorRouter } from './routes/orquestador.routes.js';
 import { createAuthRouter } from './routes/auth.routes.js';
 import { createDjRouter } from './routes/dj.routes.js';
 
@@ -39,7 +48,7 @@ import { createDjRouter } from './routes/dj.routes.js';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 loadEnvFile(resolve(__dirname, '../.env'));
 
-const repository = new InMemoryDeclaracionJuradaRepository();
+const repository = new InMemoryDeclaracionJuradaRepository(declaracionesJuradasSemilla());
 const service = new DeclaracionJuradaService(repository, new ConsoleNotificacionPublisher());
 const controller = new DjController(service);
 
@@ -81,10 +90,17 @@ const asistenteController = new AsistenteController(
 // sigue respondiendo igual, solo cambia si el fallback puede resolver preguntas por sinónimo.
 const iaTramitesHabilitada = process.env.IA_HABILITADA !== 'false';
 const tramiteRepository = new JsonTramiteRepository(resolve(__dirname, '../data/db.json'));
+// RAG (Nivel 3): embeddings locales vía Ollama — igual que retrieverSemantico, degrada solo si
+// Ollama no responde (AsistenteTramitesService.preguntar hace .catch(() => null) sobre esto), así
+// que instanciarlo eager acá no puede tumbar el boot del server.
+const retrieverSemanticoTramites = iaTramitesHabilitada
+  ? new RetrieverSemanticoTramitesService(new OllamaEmbeddingsClient(), tramiteRepository.listarTodos())
+  : null;
 const asistenteTramitesService = new AsistenteTramitesService(
   tramiteRepository,
   iaTramitesHabilitada ? new LazyGroqClient() : null,
-  iaTramitesHabilitada
+  iaTramitesHabilitada,
+  retrieverSemanticoTramites
 );
 const asistenteTramitesController = new AsistenteTramitesController(asistenteTramitesService);
 
@@ -99,6 +115,21 @@ const agenteDjSessionStore = new InMemoryAgenteSessionStore();
 const agenteDjToolClientFactory = new InProcessMcpToolClientFactory({ djService: service, usuarios: usuarioRepository });
 const agenteDjService = new AgenteDJService(new LazyGroqAgentClient(), agenteDjToolClientFactory, agenteDjSessionStore);
 const agenteDjController = new AgenteDjController(agenteDjService);
+
+// Orquestador (Nivel 5) — a diferencia de agenteDjSessionStore (en memoria), el estado acá se
+// persiste en disco (JsonConversacionRepository): sobrevive un reinicio del proceso a mitad de
+// una conversación. Reusa `service` (DeclaracionJuradaService) y `asistenteTramitesService` ya
+// instanciados arriba en vez de duplicar su lógica.
+const conversacionRepository = new JsonConversacionRepository(resolve(__dirname, '../data/conversaciones.json'));
+const orquestadorService = new OrquestadorAtencionService(
+  conversacionRepository,
+  new ClasificarIntencionService(new LazyGroqClient()),
+  usuarioRepository,
+  service,
+  asistenteTramitesService,
+  new ConsoleEscalamientoPublisher()
+);
+const orquestadorController = new OrquestadorController(orquestadorService);
 
 export const app = express();
 
@@ -124,5 +155,6 @@ app.use('/api/v1/declaraciones-juradas', createDjRouter(controller, jwtSigner, u
 app.use('/api/v1/asistente', createAsistenteRouter(asistenteController));
 app.use('/api/v1/asistente-tramites', createAsistenteTramitesRouter(asistenteTramitesController));
 app.use('/api/v1/agente-dj', createAgenteDjRouter(agenteDjController, jwtSigner, usuarioRepository));
+app.use('/api/v1/orquestador', createOrquestadorRouter(orquestadorController, jwtSigner, usuarioRepository));
 
 app.use(globalErrorHandler);

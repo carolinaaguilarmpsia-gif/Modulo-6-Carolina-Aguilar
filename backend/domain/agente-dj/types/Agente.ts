@@ -13,10 +13,29 @@ export interface PasoTraza {
   tokensUsados?: number;
 }
 
+/**
+ * Vista previa de la DJ real sobre la que se propone escribir — se arma consultando
+ * `consultar_declaracion_jurada` antes de pausar, para que quien confirma vea el contenido
+ * (docente, tipo, período, campos) y no solo un id. @see AgenteDJService.construirPreview
+ */
+export interface DJPreview {
+  djId: string;
+  docenteId: string;
+  facultadId: string;
+  tipo: string;
+  periodoAcademico: string;
+  estadoActual: string;
+  /** Estado al que pasaría la DJ si se confirma — ausente si el comando propuesto no es una transición válida desde el estado actual. */
+  estadoPropuesto?: string;
+  comando: string;
+  camposFormulario: Record<string, unknown>;
+}
+
 export interface ConfirmacionPendiente {
   herramienta: string;
   argumentos: Record<string, unknown>;
   resumen: string;
+  preview?: DJPreview;
 }
 
 export interface AgenteDJResult {

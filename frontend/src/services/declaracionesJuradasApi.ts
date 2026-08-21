@@ -1,4 +1,4 @@
-import { getInactiveBinding, getSession } from './authStore';
+import { getSession } from './authStore';
 import type {
   ApiErrorBody,
   ComandoDJ,
@@ -6,42 +6,25 @@ import type {
   CreateDjResponse,
   DjDetail,
   ListDjResponse,
-  Rol,
   TransicionDjResponse,
 } from '../types/api';
 import { ApiError } from '../types/api';
 
 const API_BASE = '/api/v1';
 
-/**
- * `backend/api/routes/dj.routes.ts` todavía usa `demoAuthMiddleware` (header, no JWT) —
- * la migración a `requireRole` real es trabajo pendiente (ver DD-UC-002 §4). Mientras tanto,
- * derivamos ese header del rol ya autenticado por login real (`POST /auth/login`), en vez de
- * un selector libre, para que el login sea la única fuente de verdad de "quién soy".
- */
-const ROL_A_DEMO_HEADER: Partial<Record<Rol, string>> = {
-  DOCENTE: 'docente',
-  ADMIN_FACULTAD: 'admin_facultad',
-  TECNICO_DPA: 'tecnico_dpa',
-  // ADMIN_SISTEMA no tiene perfil demo en el backend (no es actor de FSD-UC-002);
-  // demoAuthMiddleware cae a "docente" por defecto si el header no matchea un perfil.
-};
-
-function getDemoHeaders(): HeadersInit {
+/** `dj.routes.ts` ya usa requireRole (JWT real) — nada de headers demo. */
+function getAuthHeaders(): HeadersInit {
   const session = getSession();
-  const role = (session && ROL_A_DEMO_HEADER[session.rol]) || 'docente';
-  const inactive = getInactiveBinding() ? '1' : '0';
   return {
     'Content-Type': 'application/json',
-    'X-SGAI-Demo-User': role,
-    'X-SGAI-Demo-Inactive': inactive,
+    ...(session ? { Authorization: `Bearer ${session.token}` } : {}),
   };
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {
     ...init,
-    headers: { ...getDemoHeaders(), ...init?.headers },
+    headers: { ...getAuthHeaders(), ...init?.headers },
   });
 
   const body = (await res.json().catch(() => ({}))) as ApiErrorBody & T;

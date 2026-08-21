@@ -44,8 +44,8 @@ export class ForbiddenError extends DomainError {
 }
 
 export class NotFoundError extends DomainError {
-  constructor(code: DomainErrorCode) {
-    super(code, 404);
+  constructor(code: DomainErrorCode, ctx?: Record<string, unknown>) {
+    super(code, 404, ctx);
   }
 }
 

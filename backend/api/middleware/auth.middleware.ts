@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto';
 import type { NextFunction, Request, Response } from 'express';
 import { DomainError, UnauthorizedError, ForbiddenError } from '../../domain/shared/errors/DomainError.js';
 import type { IJwtSigner } from '../../domain/administracion/ports/out/IJwtSigner.js';
+import type { IUsuarioRepository } from '../../domain/administracion/ports/out/IUsuarioRepository.js';
 import { Rol } from '../../domain/administracion/types/Rol.js';
 
 export interface AuthenticatedUser {
@@ -24,34 +25,44 @@ export function correlationIdMiddleware(req: Request, _res: Response, next: Next
 }
 
 /**
- * RBAC real — reemplaza a `demoAuthMiddleware` fuera de `dev`.
- * Verifica el JWT emitido por `AutenticarUsuarioService` (PR-IMPL-003/004) y el rol permitido.
+ * RBAC real — reemplaza a `demoAuthMiddleware` en las rutas ya migradas (dj.routes.ts).
+ * Verifica el JWT emitido por `AutenticarUsuarioService` (PR-IMPL-003/004), el rol permitido,
+ * y resuelve `vinculacionActiva` real desde el repositorio (no asume `true` — RB-01 depende
+ * del dato real del usuario, no de la validez del token).
  * @see FSD-UC-001 · DD-UC-002
  */
-export function requireRole(jwtSigner: IJwtSigner, rolesPermitidos: Rol[]) {
-  return (req: Request, _res: Response, next: NextFunction): void => {
+export function requireRole(jwtSigner: IJwtSigner, usuarios: IUsuarioRepository, rolesPermitidos: Rol[]) {
+  return async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
     const ar = req as AuthenticatedRequest;
     ar.correlationId = (req.headers['x-correlation-id'] as string) ?? randomUUID();
 
-    const header = req.headers.authorization;
-    if (!header?.startsWith('Bearer ')) {
-      throw new UnauthorizedError('TOKEN_INVALID');
+    try {
+      const header = req.headers.authorization;
+      if (!header?.startsWith('Bearer ')) {
+        throw new UnauthorizedError('TOKEN_INVALID');
+      }
+
+      const payload = jwtSigner.verify(header.slice('Bearer '.length));
+
+      if (!rolesPermitidos.includes(payload.rol)) {
+        throw new ForbiddenError('INSUFFICIENT_ROLE', { rol: payload.rol, rolesPermitidos });
+      }
+
+      const todos = await usuarios.listar();
+      const usuario = todos.find((u) => u.id === payload.userId);
+
+      ar.user = {
+        userId: payload.userId,
+        email: payload.email,
+        rol: payload.rol,
+        facultadId: payload.facultadId,
+        // Fail-closed: si el usuario del token ya no existe en el repo, se trata como inactivo.
+        vinculacionActiva: usuario?.vinculacionActiva ?? false,
+      };
+      next();
+    } catch (err) {
+      next(err);
     }
-
-    const payload = jwtSigner.verify(header.slice('Bearer '.length));
-
-    if (!rolesPermitidos.includes(payload.rol)) {
-      throw new ForbiddenError('INSUFFICIENT_ROLE', { rol: payload.rol, rolesPermitidos });
-    }
-
-    ar.user = {
-      userId: payload.userId,
-      email: payload.email,
-      rol: payload.rol,
-      facultadId: payload.facultadId,
-      vinculacionActiva: true,
-    };
-    next();
   };
 }
 
@@ -105,6 +116,6 @@ export function globalErrorHandler(err: Error, req: Request, res: Response, _nex
     return;
   }
 
-  console.error('Unhandled error', { correlationId, type: err.constructor.name });
+  console.error('Unhandled error', { correlationId, type: err.constructor.name, message: err.message });
   res.status(500).json({ error: 'INTERNAL_ERROR', correlationId });
 }

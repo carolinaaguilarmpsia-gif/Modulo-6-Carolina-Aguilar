@@ -16,7 +16,7 @@ export class GroqClient implements ILlmClient {
   ) {
     if (!this.apiKey) {
       throw new Error(
-        'GROQ_API_KEY no configurado. Agregalo a backend/.env (ver backend/.env.example) — nunca al código.'
+        'GROQ_API_KEY no configurado'
       );
     }
   }

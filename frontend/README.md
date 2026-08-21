@@ -20,12 +20,14 @@ Abrir: http://localhost:5173/ — redirige a `/login` si no hay sesión.
 
 Password para todas: `Demo1234!`
 
-| Email | Rol |
-|---|---|
-| `docente@universidad.edu.bo` | Docente |
-| `admin.facultad@universidad.edu.bo` | Admin. Facultad |
-| `dpa@universidad.edu.bo` | Técnico DPA |
-| `admin.sistema@universidad.edu.bo` | Admin. Sistema |
+| Email | Rol | Vinculación activa |
+|---|---|---|
+| `docente@universidad.edu.bo` | Docente | Sí |
+| `juan.jaldin@universidad.edu.bo` | Docente (Juan Jaldin) | Sí |
+| `carlos.paz@universidad.edu.bo` | Docente (Carlos Paz) | **No** — para probar RB-01 |
+| `admin.facultad@universidad.edu.bo` | Admin. Facultad | Sí |
+| `dpa@universidad.edu.bo` | Técnico DPA | Sí |
+| `admin.sistema@universidad.edu.bo` | Admin. Sistema | Sí |
 
 ### Flujo completo a probar
 
@@ -38,7 +40,7 @@ Password para todas: `Demo1234!`
 
 ### RB-01
 
-Logueado como Docente, marcar «Simular sin vinculación activa» en la barra gris → crear DJ falla con 403.
+Login con **Carlos Paz** (sin vinculación activa en los datos semilla) → crear DJ falla con 403 `INACTIVE_BINDING`. Con cualquier otro docente, funciona normal.
 
 ## Rutas
 
@@ -58,4 +60,4 @@ Proxy: `/api` → `http://localhost:3001` (ver `vite.config.ts`)
 ## Notas de arquitectura
 
 - Sesión (JWT) en memoria — no persiste al refrescar la página (`docs/SKILLS/auth-rbac-guard.md`, MUST NOT localStorage).
-- `dj.routes.ts` en el backend todavía usa `demoAuthMiddleware` (no JWT real); el frontend deriva ese header del rol ya autenticado. Ver `docs/design/DD-UC-002.md` §2/§4.
+- `dj.routes.ts` ya usa `requireRole` (JWT real, no header demo) — cada DJ queda atribuida al usuario realmente logueado. `demoAuthMiddleware` sigue existiendo solo para `asistente.routes.ts` (pendiente de migrar también).

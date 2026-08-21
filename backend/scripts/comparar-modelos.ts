@@ -6,7 +6,7 @@ import { ConsoleNotificacionPublisher } from '../infrastructure/notifications/Co
 import { InMemoryDeclaracionJuradaRepository } from '../infrastructure/persistence/InMemoryDeclaracionJuradaRepository.js';
 import { OllamaClient } from '../infrastructure/ai/OllamaClient.js';
 import { GroqClient } from '../infrastructure/ai/GroqClient.js';
-import { loadEnvFile } from './loadEnv.js';
+import { loadEnvFile } from '../infrastructure/config/loadEnv.js';
 
 loadEnvFile(resolve(process.cwd(), 'backend/.env'));
 

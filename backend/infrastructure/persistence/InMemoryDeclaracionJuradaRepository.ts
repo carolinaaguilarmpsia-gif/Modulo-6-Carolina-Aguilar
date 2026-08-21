@@ -15,6 +15,11 @@ export class InMemoryDeclaracionJuradaRepository implements IDeclaracionJuradaRe
   private readonly store = new Map<string, DeclaracionJurada>();
   private readonly historialStore: HistorialDJRecord[] = [];
 
+  /** @param seed DJ precargadas (p. ej. seedDeclaracionesJuradas.ts) — vacío en tests. */
+  constructor(seed: DeclaracionJurada[] = []) {
+    for (const dj of seed) this.store.set(dj.id, { ...dj });
+  }
+
   async create(dj: DeclaracionJurada): Promise<DeclaracionJurada> {
     this.store.set(dj.id, { ...dj });
     return { ...dj };

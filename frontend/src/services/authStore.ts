@@ -15,7 +15,6 @@ type Listener = () => void;
  * aceptada por seguridad; el usuario vuelve a iniciar sesión.
  */
 let session: AuthSession | null = null;
-let inactiveBinding = false;
 const listeners = new Set<Listener>();
 
 function emit(): void {
@@ -28,15 +27,6 @@ export function getSession(): AuthSession | null {
 
 export function setSession(next: AuthSession | null): void {
   session = next;
-  emit();
-}
-
-export function getInactiveBinding(): boolean {
-  return inactiveBinding;
-}
-
-export function setInactiveBindingFlag(value: boolean): void {
-  inactiveBinding = value;
   emit();
 }
 

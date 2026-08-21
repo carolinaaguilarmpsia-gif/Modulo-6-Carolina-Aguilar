@@ -1,0 +1,505 @@
+[
+    {
+      "departamento": "Coordinación Académica",
+      "tramites": [
+        {
+          "codigo": "DCA-01",
+          "nombre": "Oferta Académica para inicio de gestión",
+          "descripcion": "Oferta Académica de una gestión, la cual tiene correspondencia al pensum de una Carrera ó Programa y es ofertado a los Estudiantes en el WEBSIS antes del inicio de clases de una determinada gestión académica.",
+          "normativa": "Resolución Rectoral N° 750/17 del 15 de agosto del 2017",
+          "requisitos": [
+            "Carta dirigida a Dirección de la DPA",
+            "Resolución del H. Consejo Facultativo o Vicerrectoral específica",
+            "Formulario FORM-DCA 04 (Nombramiento y Seguimiento)",
+            "Formulario FORM-DCA 08 (DD.JJ. de Remuneración Pública)",
+            "Certificación de Asignación Presupuestaria de la DAF",
+            "Resolución del Calendario Académico Facultativo",
+            "Formularios de DD.JJ. de Inexistencia de Incompatibilidad (FORM-DPA-DJ 3, 4 y 5)"
+          ],
+          "requisitos_detallados": [
+            {
+              "tipo": "CARTA",
+              "descripcion": "Dirigida a Dirección de la DPA con el tenor respectivo de presentación de Oferta Académica para inicio de gestión.",
+              "nota": "Dirigida actualmente al Lic. José Antonio Ríos Claros (Director a.i. DPA)."
+            },
+            {
+              "tipo": "RESOLUCION",
+              "descripcion": "Resolución del Honorable Consejo Facultativo (o Vicerrectoral) ESPECÍFICA de aprobación de Oferta Académica para la gestión en curso.",
+              "especificaciones": [
+                "Dos ejemplares impresos y firmados en tamaño oficio, generados mediante el sistema GAIA.",
+                "Formato estándar establecido en la resolución RR N° 750/17.",
+                "Debe contener nombre completo y código SISS de los Docentes, nombre y código de la Materia, grupo y carga horaria asignada."
+              ],
+              "importancia": "Documento básico para futuros cambios de asignación docente en la gestión."
+            },
+            {
+              "tipo": "FORMULARIO",
+              "codigo_formulario": "FORM-DCA 04",
+              "descripcion": "Solicitud de Nombramiento y Seguimiento Docente a dedicación parcial.",
+              "especificaciones": [
+                "Generado mediante GAIA para cada docente designado.",
+                "Debe incluir todas las materias, grupos y horarios de clases semanales.",
+                "Impreso en tamaño oficio con firmas de Autoridades Facultativas y el Docente.",
+                "Para materias ACÉFALAS, registrar como 'POR DESIGNAR' en el sistema (no requiere impresión)."
+              ]
+            },
+            {
+              "tipo": "FORMULARIO",
+              "codigo_formulario": "FORM-DCA 08",
+              "descripcion": "Declaración Jurada de Percepción de Remuneración en el Sector Público.",
+              "especificaciones": [
+                "Llenado y firmado por cada docente con información real.",
+                "Debe declarar todos los ingresos de entidades públicas.",
+                "La fecha de registro (llenado y servicio) debe corresponder al mes de emisión de la Resolución de Consejo Facultativo."
+              ]
+            },
+            {
+              "tipo": "CERTIFICACION",
+              "descripcion": "Asignación Presupuestaria de horas académicas emitida por la DAF (RCU N° 15/16).",
+              "detalle": "Establece el límite máximo de horas pizarra mensuales que la Facultad puede ejecutar."
+            },
+            {
+              "tipo": "RESOLUCION",
+              "descripcion": "Calendario Académico Facultativo (fotocopia legalizada por Decano o Secretario Administrativo).",
+              "detalle": "Define oficialmente las fechas de inicio y fin del periodo académico."
+            },
+            {
+              "tipo": "FORMULARIO",
+              "codigo_formulario": "FORM-DPA-DJ 4",
+              "descripcion": "Declaración Jurada de Inexistencia de Incompatibilidad Laboral Académica – Administrativa (Autoridades).",
+              "detalle": "Las autoridades declaran que sus horas de labor docente no se sobreponen con el ejercicio de sus cargos."
+            },
+            {
+              "tipo": "FORMULARIO",
+              "codigo_formulario": "FORM-DPA-DJ 5",
+              "descripcion": "Declaración Jurada de Inexistencia de Incompatibilidad Laboral Académica – Administrativa (Administrativos).",
+              "detalle": "Para docentes que también prestan servicios administrativos."
+            },
+            {
+              "tipo": "FORMULARIO",
+              "codigo_formulario": "FORM-DPA-DJ 3",
+              "descripcion": "Declaración Jurada de Inexistencia de Incompatibilidad Laboral (160 horas).",
+              "alcance": "Obligatorio para Jefes, Docentes Exclusivos, Investigadores y Asistentes con funciones exclusivas (160 horas/mes).",
+              "nota": "Debe contar con firma original del docente."
+            }
+          ],
+          "tiempo": "Una semana previa al inicio de la gestión académica [1-3]"
+        },
+        {
+          "codigo": "DCA-02",
+          "nombre": "Cambio de Docente en Materia/Grupo durante una gestión",
+          "requisitos": [
+            "Carta dirigida a Dirección de la DPA",
+            "Resolución del Consejo de Carrera (RCC) y del H. Consejo Facultativo (RHCF)",
+            "Formulario DPA-01 (Modificación de datos)",
+            "Formulario FORM-DCA-04 y FORM-DCA 05 (Seguimiento)",
+            "Formulario FORM-DCA 08 (DD.JJ. de Remuneración Pública)",
+            "Formulario FORM-DCA 09 (CV estándar si el docente es nuevo)"
+          ],
+          "tiempo": "Inmediatamente se apruebe la licencia [4-6]"
+        },
+        {
+          "codigo": "DCA-03",
+          "nombre": "Designación temporal en Materia/Grupo acéfalo",
+          "requisitos": [
+            "Carta dirigida a Dirección de la DPA",
+            "Resoluciones de Consejo de Carrera, H. Consejo Facultativo y Vicerrectoral",
+            "Formulario FORM-DPA 14 y FORM-DPA 15",
+            "Formulario FORM-DCA 08 y FORM-DCA 09 (si es nuevo)",
+            "Documentación completa del proceso de designación",
+            "Resolución del Calendario Académico Facultativo"
+          ],
+          "tiempo": "15 días previo al inicio de la gestión académica [7-9]"
+        },
+        {
+          "codigo": "DCA-04",
+          "nombre": "Designación de suplente para Docente que asume Función de Autoridad (etapa 1)",
+          "requisitos": [
+            "Carta de solicitud de licencia del docente al Rector",
+            "Carta con el importe por hora para el suplente",
+            "Formulario FORM DCA-05 y FORM-DCA-04 de la autoridad",
+            "Resolución Rectoral de nombramiento de autoridad",
+            "DD.JJ. de no relación consanguínea",
+            "Formularios FORM-DCA-04, 05, 08 y 09 (según si el suplente es regular o externo)",
+            "Plan Global de la asignatura en suplencia"
+          ],
+          "tiempo": "Una semana antes de que el docente suplente inicie actividades [10-12]"
+        },
+        {
+          "codigo": "DCA-05",
+          "nombre": "Remuneración al suplente del Docente que asumió Función de Autoridad (etapa 2)",
+          "requisitos": [
+            "Carta de solicitud de pago de remuneración",
+            "Documentación del trámite de Designación (Etapa 1)",
+            "Formularios de Control de Asistencia diario (manual) y mensual",
+            "Documentación de Compromiso de Pago por Consultoría",
+            "Resolución de licencia y designación de suplencia",
+            "Informe de actividades por materia y grupo",
+            "Ficha de verificación de documentos de prestación de servicios"
+          ],
+          "tiempo": "Al día siguiente de la conclusión de la gestión académica [13, 14]"
+        },
+        {
+          "codigo": "DCA-06",
+          "nombre": "Creación de Grupos Nuevos",
+          "requisitos": [
+            "Carta con justificación a la DPA",
+            "Resolución de RCC y RHCF (o Vicerrectoral)",
+            "Matriz de Ejecución de Carga Horaria",
+            "Formulario DPA-02",
+            "Certificación Presupuestaria DAF e informe POA (DPPyS)",
+            "Visto Bueno de Vicerrectorado"
+          ],
+          "tiempo": "Una semana antes del inicio de Inscripciones [15-17]"
+        },
+        {
+          "codigo": "DCA-07",
+          "nombre": "Nombramiento de Auxiliar de Docencia",
+          "requisitos": [
+            "Carta a la DPA y Resolución del RHCF",
+            "Formulario FORM-DCA-02 y CV Standard para Auxiliares",
+            "Certificación de Disponibilidad Presupuestaria DAF",
+            "Acta de la comisión de calificación",
+            "Documentación y certificaciones de los alumnos designados",
+            "Presupuesto y Matriz de ejecución de carga horaria",
+            "Convocatoria del proceso de selección"
+          ],
+          "tiempo": "Una semana antes del inicio de Inscripciones [18-20]"
+        },
+        {
+          "codigo": "DCA-08",
+          "nombre": "Nombramiento Docentes a Dedicación Exclusiva",
+          "requisitos": [
+            "Carta a la DPA y Resolución del RHCF",
+            "Formularios FORM-DCA-02, 05 y 08",
+            "Formulario de aprobación de Proyecto con QR (SISPOA)",
+            "Certificación de Disponibilidad Presupuestaria DAF",
+            "Certificado de disponibilidad mínima de 32 horas académicas",
+            "Informe de Evaluación Anual de la gestión pasada",
+            "Formulario FORM-DPA-DJ 3 y Tabla de Carga Horaria de la DAF",
+            "Formulario POA Individual y Autoevaluación del 3er trimestre"
+          ],
+          "tiempo": "Una semana antes del inicio de Inscripciones [21-24]"
+        },
+        {
+          "codigo": "DCA-09",
+          "nombre": "Nombramiento Docente Investigador",
+          "requisitos": [
+            "Carta a la DPA y Resolución del RHCF",
+            "Formularios FORM02-INV y FORMULARIO-DCA-05IN",
+            "Informe de Evaluación Anual de la gestión pasada",
+            "Formulario FORM-DCA-08 y Certificación DAF",
+            "Formulario y Dictamen de aprobación de Proyecto (SISPOA)",
+            "DD.JJ. de Inexistencia de Incompatibilidad Laboral",
+            "Formulario FORM02-INV-D (si tiene docencia en aula)",
+            "Tabla de Carga Horaria y CV Estándar (DCA FORM 09) si es nuevo"
+          ],
+          "tiempo": "Un mes antes del inicio de gestión [25-28]"
+        },
+        {
+          "codigo": "DCA-10",
+          "nombre": "Nombramiento Docente a Tiempo Completo",
+          "requisitos": [
+            "Carta a la DPA y Resolución del RHCF",
+            "Formularios FORM-DCA-02TC, 05TC y 08",
+            "Tabla de Carga Horaria Docente (DAF)",
+            "Certificación de Disponibilidad Presupuestaria (DAF)",
+            "Formulario POA Individual y DD.JJ. de Incompatibilidad",
+            "Formulario de aprobación de Proyecto (SISPOA)",
+            "Informe de Evaluación Anual y Autoevaluación del 3er trimestre",
+            "Formulario DCA FORM 09 (si es nuevo)"
+          ],
+          "tiempo": "Una semana previa al inicio de la gestión académica [28-31]"
+        },
+        {
+          "codigo": "DCA-11",
+          "nombre": "Rotación de Docentes en Materias/Grupos",
+          "requisitos": [
+            "Carta justificada y Resolución de RCC refrendada por RHCF",
+            "Formulario DPA-04 de Solicitud de Rotación",
+            "Formularios FORM-DCA-04 y 05 del docente asignado",
+            "Certificación de Disponibilidad Presupuestaria de la DAF"
+          ],
+          "tiempo": "Una semana antes del inicio de Inscripciones [32-34]"
+        },
+        {
+          "codigo": "DCA-12",
+          "nombre": "Asignación de Docente en Materia Electiva creada",
+          "requisitos": [
+            "Carta y Resolución del RHCF de nombramiento",
+            "Acuerdo Técnico del DDC aprobado en Comité Académico",
+            "Formularios FORM-DCA-04 y 05 para el docente asignado",
+            "Certificación de Disponibilidad Presupuestaria de la DAF",
+            "Formulario DPA-01 de Modificación de datos"
+          ],
+          "tiempo": "Una semana antes del inicio de Inscripciones [35-37]"
+        }
+      ]
+    },
+    {
+      "departamento": "Seguimiento y Evaluación",
+      "tramites": [
+        {
+          "codigo": "DSE-01",
+          "nombre": "Venta de Matrículas",
+          "requisitos": [
+            "CARTA: Dirigida a Dirección de la DPA con el detalle de la matrícula según formato de la Circular N° 35/2021 [4].",
+            "RESOLUCIÓN: Del Honorable Consejo Facultativo (RHCF) aprobando el monto de la matrícula y el Calendario Académico [4].",
+            "CALENDARIO: Académico de la gestión elaborado por la Facultad [5]."
+          ],
+          "tiempo": "2 días hábiles (48 horas) antes [5]."
+        },
+        {
+          "codigo": "DSE-02",
+          "nombre": "Inscripciones por WEBSIS",
+          "requisitos": [
+            "CARTA: Dirigida a Dirección de la DPA solicitando la apertura de ciclo de inscripciones por Internet [6].",
+            "FORMULARIO: DPA-03 de Apertura de Ciclos indicando las fechas de apertura del sistema [6]."
+          ],
+          "tiempo": "1 día hábil (24 horas) antes [6]."
+        },
+        {
+          "codigo": "DSE-03",
+          "nombre": "Inscripciones manuales por el SISS",
+          "requisitos": [
+            "CARTA: Dirigida a Dirección de la DPA para apertura de ciclo de inscripciones manuales [7].",
+            "FORMULARIO: DPA-03 de Apertura de Ciclos para inscripción manual [7].",
+            "RESOLUCIÓN: Del Honorable Consejo Facultativo (RHCF) específica para el trámite de Inscripción Manual [7]."
+          ],
+          "tiempo": "1 día hábil (24 horas) antes [8]."
+        },
+        {
+          "codigo": "DSE-04",
+          "nombre": "Registro de Notas vía WEBSISS para GESTIÓN ACTUAL",
+          "requisitos": [
+            "CARTA: Dirigida a Dirección de la DPA con el tenor de Registro de Notas [8].",
+            "FORMULARIO: DPA-03 de Apertura de Ciclos indicando fechas para registro de calificaciones [8].",
+            "CRONOGRAMA: De fechas de apertura y cierre registradas en el Calendario Académico Facultativo [9].",
+            "FORMULARIO: DPA-06 para la transcripción de notas [9]."
+          ],
+          "tiempo": "1 día hábil (24 horas) antes [9]."
+        },
+        {
+          "codigo": "DSE-05",
+          "nombre": "Registro de notas vía WEBSISS para una GESTIÓN PASADA",
+          "requisitos": [
+            "CARTA: Dirigida a Dirección de la DPA solicitando el registro de notas de una gestión anterior [10].",
+            "FORMULARIO: DPA-07 de modificación de notas para gestiones anteriores [10].",
+            "RESOLUCIÓN: Expresa del Honorable Consejo Facultativo (RHCF) para la modificación de notas [10]."
+          ],
+          "tiempo": "1 día hábil (24 horas) antes [10]."
+        },
+        {
+          "codigo": "DSE-06",
+          "nombre": "Registro de notas vía WEBSISS para CASOS ESPECIALES",
+          "requisitos": [
+            "CARTA: Dirigida a Dirección de la DPA para casos excepcionales [11].",
+            "RESOLUCIÓN: Del RHCF designando al responsable de la UTI Facultativa para la transcripción [11].",
+            "FORMULARIO: DPA-04-02 de transcripción de notas [11].",
+            "FORMULARIO: DPA-03 de Apertura de Ciclos para inscripciones en casos especiales [11].",
+            "RESOLUCIÓN: Del RHCF de nombramiento de los docentes en las materias y grupos involucrados [12]."
+          ],
+          "tiempo": "1 día hábil (24 horas) antes [12]."
+        },
+        {
+          "codigo": "DSE-07",
+          "nombre": "Admisiones Estudiantes Regulares",
+          "requisitos": [
+            "CARTA: Dirigida a la DPA indicando detalle de reincorporaciones o cambios de carrera, facultad, e identificación de gestión (anual/semestral) [13].",
+            "FORMULARIO: DPA-03 de Apertura de Ciclos para la inscripción [13]."
+          ],
+          "tiempo": "1 día hábil (24 horas) antes [13]."
+        },
+        {
+          "codigo": "DSE-08",
+          "nombre": "Apertura del Sistema de Postulantes (SISPO)",
+          "requisitos": [
+            "CARTA: Dirigida a Dirección de la DPA solicitando la apertura del sistema [14].",
+            "CRONOGRAMA: De fechas en que se solicita la apertura [15].",
+            "FORMULARIO: SISPO-01 indicando fechas de apertura y cierre para el registro de postulantes [15]."
+          ],
+          "tiempo": "1 día hábil (24 horas) antes [15]."
+        },
+        {
+          "codigo": "DSE-09",
+          "nombre": "Creación de Perfiles de Usuarios para acceso al SISS",
+          "requisitos": [
+            "CARTA: Dirigida a la DPA con la justificación necesaria para la creación de la nueva cuenta de usuario [16]."
+          ],
+          "tiempo": "1 día hábil (24 horas) antes [16]."
+        },
+        {
+          "codigo": "DSE-10",
+          "nombre": "Creación de Impresoras y Otros Accesos para Operación del SISS",
+          "requisitos": [
+            "CARTA: Dirigida a Dirección de la DPA para el registro de una nueva impresora o recurso en el sistema [17]."
+          ],
+          "tiempo": "1 día hábil (24 horas) antes [17]."
+        },
+        {
+          "codigo": "DSE-11",
+          "nombre": "Admisión Estudiantes Nuevos",
+          "requisitos": [
+            "CARTA: Dirigida a la DPA acompañada de la documentación pertinente según el caso [17].",
+            "ACTA NOTARIADA: Original y copia del acta notariada [18].",
+            "RESOLUCIÓN Y CONVOCATORIA: Al examen de ingreso [18].",
+            "RESOLUCIÓN: De aprobación del Calendario Académico de la gestión actual [18].",
+            "DOCUMENTACIÓN TÉCNICA: Patrón de preguntas, patrón de respuestas y planillas SISPO de aprobados, reprobados y abandonos [18].",
+            "PLANILLAS: De respuestas de los postulantes [18]."
+          ],
+          "tiempo": "3 días (72 horas) antes [18]."
+        }
+      ]
+    },
+    {
+      "departamento": "Desarrollo Curricular",
+      "tramites": [
+        {
+          "codigo": "DDC-01",
+          "nombre": "Creación de Unidades de Formación",
+          "requisitos": [
+            "CARTA: Dirigida a Dirección de la DPA solicitando Ajuste(s) Parcial(es) de creación con el VoBo del Decano [7].",
+            "ACTA COMISION: Designación de responsables de elaboración de la propuesta de adición [7].",
+            "FORMULARIO: Específico para la Creación de una Unidad de Formación (materia, talleres, etc.) [7].",
+            "TABLA: De ejecución de Cargas Horarias elaborada en la Facultad [2].",
+            "RESOLUCIÓN: Del Consejo de Carrera (R.C.C.) específica que aprueba la creación [2].",
+            "RESOLUCIÓN: Del Honorable Consejo Facultativo (R.H.C.F.) refrendando la R.C.C. [2]."
+          ],
+          "tiempo": "Dos (2) meses antes del periodo de Inscripción [2]."
+        },
+        {
+          "codigo": "DDC-02",
+          "nombre": "Supresión de Unidades de Formación",
+          "requisitos": [
+            "CARTA: Dirigida a Dirección de la DPA solicitando Ajuste(s) Parcial(es) de supresión con VoBo del Decano [8].",
+            "ACTA COMISION: Designación de responsables de elaboración de la propuesta de supresión [8].",
+            "FORMULARIO: Formulario de supresión (ya sea con convalidación, sin convalidación o con redistribución de carga horaria) [9].",
+            "RESOLUCIÓN: Del Consejo de Carrera (R.C.C.) que apruebe la supresión [9].",
+            "RESOLUCIÓN: Del Honorable Consejo Facultativo (R.H.C.F.) refrendando la R.C.C. [3]."
+          ],
+          "tiempo": "Dos (2) meses antes del periodo de Inscripción [3]."
+        },
+        {
+          "codigo": "DDC-03",
+          "nombre": "Fusión de dos Unidades de Formación",
+          "requisitos": [
+            "CARTA: Solicitando Ajuste(s) Parcial(es) correspondiente a la fusión con VoBo del Decano [10].",
+            "ACTA COMISION: Designación de responsables de la propuesta de fusión [10].",
+            "FORMULARIO: Según si se crea una nueva denominación o se mantiene la denominación y código SISS de una de ellas [10, 11].",
+            "RESOLUCIÓN: Del Consejo de Carrera (RCC) específica para la fusión dentro de un proceso de Transformación Curricular [11].",
+            "RESOLUCIÓN: Del Honorable Consejo Facultativo (RHCF) refrendando la RCC [11]."
+          ],
+          "tiempo": "Dos (2) meses antes del periodo de Inscripción [4]."
+        },
+        {
+          "codigo": "DDC-04",
+          "nombre": "Cambio de Nivel de Materia (Unidad de Formación)",
+          "requisitos": [
+            "CARTA: Dirigida a Dirección de la DPA solicitando el Ajuste Parcial respectivo [4].",
+            "RESOLUCIÓN: Designación de una Comisión de responsables de la propuesta de cambio de nivel [12].",
+            "FORMULARIO: Formulario para el cambio de nivel de una Unidad de Formación [12].",
+            "RESOLUCIÓN: Del Consejo de Carrera (RCC) específica para el cambio de nivel [12].",
+            "RESOLUCIÓN: Del Honorable Consejo Facultativo (RHCF) refrendando la RCC [5]."
+          ],
+          "tiempo": "Dos (2) meses antes del periodo de Inscripción [5]."
+        },
+        {
+          "codigo": "DDC-05",
+          "nombre": "Modificación de pre-requisitos de una Materia (Unidad de Formación)",
+          "requisitos": [
+            "CARTA: Solicitando el Ajuste Parcial al Plan de Estudios [13].",
+            "RESOLUCIÓN: Designación de la Comisión de responsables de la propuesta de modificación [13].",
+            "FORMULARIO: Específico para la modificación de pre-requisitos [13].",
+            "RESOLUCIÓN: Del Consejo de Carrera (RCC) específica para la modificación de pre-requisitos [13].",
+            "RESOLUCIÓN: Del Honorable Consejo Facultativo (RHCF) refrendando la RCC [6]."
+          ],
+          "tiempo": "Dos (2) meses antes del periodo de Inscripción [6]."
+        },
+        {
+          "codigo": "DDC-06",
+          "nombre": "Deshabilitación y habilitación de Materias (Unidades de Formación) Electivas",
+          "requisitos": [
+            "CARTA: Solicitando Ajuste(s) Parcial(es) al Plan de Estudios respectivo [14].",
+            "RESOLUCIÓN: Designación de responsables de elaboración de la propuesta de Ajuste Parcial [14].",
+            "FORMULARIO: Ya sea para unidades electivas ya existentes o para la deshabilitación de una existente y creación de otra [14, 15].",
+            "RESOLUCIÓN: Del Consejo de Carrera (RCC) específica para la deshabilitación y habilitación [15].",
+            "RESOLUCIÓN: Del Honorable Consejo Facultativo (RHCF) refrendando la RCC [15]."
+          ],
+          "tiempo": "Dos (2) meses antes del periodo de Inscripción [15]."
+        }
+      ]
+    },
+    {
+      "departamento": "Personal Académico",
+      "tramites": [
+        {
+          "codigo": "DPA-01",
+          "nombre": "Emisión de Certificado de Trabajo",
+          "requisitos": [
+            "RECIBO: Para emisión de Certificado de Trabajo de: Docente, Auxiliar u Otro [1]."
+          ],
+          "tiempo": "1 día hábil (24 horas) antes [1]."
+        },
+        {
+          "codigo": "DPA-02",
+          "nombre": "Certificación para Beneficios Sociales – por RENUNCIA",
+          "requisitos": [
+            "CARTA: De renuncia al cargo presentada al Sr. Rector (fotocopia) con sello de recepción [2].",
+            "CARTA: De aceptación de renuncia (fotocopia) emitida por el Sr. Rector de la UMSS [2].",
+            "CARNET DE IDENTIDAD: En vigencia (fotocopia) [2].",
+            "RECIBO: De compra de valorado de inicio de trámite (adquirido en Caja Central) [2].",
+            "RECIBO: De compra de valorado de solvencia (adquirido en Caja Central) [2].",
+            "RECIBO: De compra de valorado de certificación de años de servicio (adquirido en Caja Central) [2].",
+            "FORMULARIO: DCA FORM 08, Declaración Jurada de Percepción de Remuneración en el Sector Público [3].",
+            "FORMULARIO: De Declaración Jurada de Bienes y Rentas de la Contraloría General del Estado [3]."
+          ],
+          "tiempo": "1 semana [3]."
+        },
+        {
+          "codigo": "DPA-03",
+          "nombre": "Certificación para Beneficios Sociales – por FALLECIMIENTO",
+          "requisitos": [
+            "CARNET DE IDENTIDAD: Del dependiente (fotocopia) [3].",
+            "CERTIFICADO: De defunción en original [3].",
+            "DOCUMENTACIÓN: De los familiares [4].",
+            "RECIBO: De compra de valorado de inicio de trámite (adquirido en Caja Central) [4].",
+            "RECIBO: De compra de valorado de solvencia (adquirido en Caja Central) [4].",
+            "RECIBO: De compra de valorado de certificación de años de servicio (adquirido en Caja Central) [4].",
+            "FORMULARIO: DCA FORM 08, Declaración Jurada de Percepción de Remuneración en el Sector Público [4]."
+          ],
+          "tiempo": "1 semana [4]."
+        }
+      ]
+    },
+    {
+      "departamento": "Registros e Inscripciones",
+      "tramites": [
+      {
+        "codigo": "DRI-01",
+        "nombre": "Admisión de Estudiantes Nuevos que NO TIENEN CÓDIGO SISS",
+        "requisitos": [
+          "DIPLOMA: de Bachiller en Humanidades (fotocopia) [1].",
+          "CARNET: o Cédula de Identidad (fotocopia) [1].",
+          "CERTIFICADO: de Nacimiento (fotocopia) [2].",
+          "FOTOGRAFÍA: Tamaño 4x4 cm, fondo color rojo o azul [2].",
+          "FORMULARIO: de Admisión de Estudiante Nuevo (electrónico) [2].",
+          "RESOLUCIÓN: Rectoral que avala el ingreso por Modalidad de Admisión Directa (solo para estudiantes admitidos mediante esta modalidad) [2]."
+        ],
+        "tiempo": "1 semana [2]."
+      },
+      {
+        "codigo": "DRI-02",
+        "nombre": "Admisión de Estudiantes que TIENEN CÓDIGO SISS ANTIGUO",
+        "requisitos": [
+          "DIPLOMA: de Bachiller en Humanidades (fotocopia) [3].",
+          "CARNET: o Cédula de Identidad (fotocopia) [3].",
+          "CERTIFICADO: de Nacimiento (fotocopia) [3].",
+          "FOTOGRAFÍA: Tamaño 4x4 cm, fondo color rojo o azul [3].",
+          "FORMULARIO: de Admisión de Estudiante Nuevo (electrónico) [3].",
+          "NOTA: El postulante no debe estar inscrito en una carrera o programa anterior; caso contrario, deberá realizar la suspensión condicional de dicha carrera [3]."
+        ],
+        "tiempo": "1 semana [3]."
+      }
+    ]
+    }
+  ]
