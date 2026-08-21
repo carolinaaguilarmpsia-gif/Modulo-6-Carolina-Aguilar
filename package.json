@@ -11,7 +11,10 @@
     "dev:dj": "npm run dev:api & npm run dev:web",
     "test:domain:dj": "NODE_OPTIONS=--experimental-vm-modules jest backend/domain/declaracion-jurada/services/DJStateMachine.test.ts --watchman=false",
     "test:domain:auth": "NODE_OPTIONS=--experimental-vm-modules jest backend/domain/administracion --watchman=false",
-    "test:domain": "NODE_OPTIONS=--experimental-vm-modules jest backend/domain --watchman=false --coverage"
+    "test:domain": "NODE_OPTIONS=--experimental-vm-modules jest backend/domain --watchman=false --coverage",
+    "test:domain:tramites": "NODE_OPTIONS=--experimental-vm-modules jest backend/domain/tramites-dpa --watchman=false",
+    "test:domain:agente-dj": "NODE_OPTIONS=--experimental-vm-modules jest backend/domain/agente-dj --watchman=false",
+    "test:infra:mcp": "NODE_OPTIONS=--experimental-vm-modules jest backend/infrastructure/mcp --watchman=false"
   },
   "devDependencies": {
     "@types/jest": "^29.5.12",

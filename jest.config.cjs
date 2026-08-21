@@ -16,5 +16,9 @@ module.exports = {
       },
     ],
   },
-  testMatch: ['**/backend/domain/**/*.test.ts'],
+  testMatch: [
+    '**/backend/domain/**/*.test.ts',
+    '**/backend/infrastructure/mcp/**/*.test.ts',
+    '**/backend/infrastructure/persistence/**/*.test.ts',
+  ],
 };
